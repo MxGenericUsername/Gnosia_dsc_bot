@@ -1,2 +1,2 @@
 # Gnosia_dsc_bot
-A discrod bot for live gnosia games
+A discord bot for live gnosia games
