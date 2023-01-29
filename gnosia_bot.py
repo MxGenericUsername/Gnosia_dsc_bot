@@ -152,7 +152,7 @@ async def voting_timer():
             await count_votes()
 
 
-async def start_the_game(chan):
+async def start_the_game(chan,args):
     global players
     global gd
     n = 0
@@ -169,6 +169,14 @@ async def start_the_game(chan):
     await gd.info_channel.send("counted the players")
     gd.players = len(players)
     print(players)
+    i = 1
+    while (i + 1 < len(roles)):
+        if (1 << i & args[0] != 0):
+            gd.roles[i].number = 1
+
+    gd.roles[4].number = args[1]
+    if (gd.roles[2].number == 1):
+        gd.roles[2].number = 2
 
     if (gd.players >= gd.role_amount):
         i = 0
@@ -845,7 +853,7 @@ async def start(ctx):
         voting_timer.start()
 
 
-async def guardreveal():
+async def guardreveal(args,ctx):
     if (gd.game == True and gd.curp == 0):
         x = -1
         i = 0
