@@ -58,13 +58,13 @@ gnosia = []
 
 roles = []
 roles.append(role(0, "a Crewmate", 0, "You're just a normal crewmate, no special commands", 0))
-roles.append(role(1, "an Engineer", 1, "special commands: !engireveal, !engiscan player_id gnosia/human (if faking, optional)", 1))
+roles.append(role(1, "an Engineer", 0, "special commands: !engireveal, !engiscan player_id gnosia/human (if faking, optional)", 1))
 roles.append(role(2, "Guard Duty", 0, "!guardreveal", 0))
 roles.append(role(3, "a Guardian Angel", 0, "special commands: !guard player_id", 1))
-roles.append(role(4, "a Gnosia", 1, "special commands: every special command except for guard", 3))
+roles.append(role(4, "a Gnosia", 0, "special commands: every special command except for guard", 3))
 roles.append(role(5, " an AC Follower", 0, "special commands: every special command except for guard and nighttime vote", 2))
-roles.append(role(6, "A Bug", 1, "pecial commands: every special command except for guard and nighttime vote", 2))
-roles.append(role(7, "A Doctor", 1, "special commands: !claim doctor, !docscan player_id gnosia/human (if faking, optional)", 1))
+roles.append(role(6, "A Bug", 0, "pecial commands: every special command except for guard and nighttime vote", 2))
+roles.append(role(7, "A Doctor", 0, "special commands: !claim doctor, !docscan player_id gnosia/human (if faking, optional)", 1))
 
 class phase(Enum):
     day = 0
@@ -74,7 +74,8 @@ class phase(Enum):
     end = 4
 
 class game_data():
-    test = True
+    #leave it this way unless you're trying to test the changes you've made on "bots"
+    test = False
     role_amount = 0
     voting_time = 300
 
@@ -152,7 +153,7 @@ async def voting_timer():
             await count_votes()
 
 
-async def start_the_game(chan,args):
+async def start_the_game(chan,roles_enabled, gnosia_enabled):
     global players
     global gd
     n = 0
@@ -163,20 +164,29 @@ async def start_the_game(chan,args):
                 players.append(player(chan.members[i], n))
                 await players[i].prof.send("you should recieve this message")
 
-                print(type(players[0]))
+                #print(type(players[0]))
                 n += 1
             i += 1
     await gd.info_channel.send("counted the players")
     gd.players = len(players)
-    print(players)
+    #print(players)
     i = 1
-    while (i + 1 < len(roles)):
-        if (1 << i & args[0] != 0):
-            gd.roles[i].number = 1
+    #print(len(roles))
 
-    gd.roles[4].number = args[1]
-    if (gd.roles[2].number == 1):
-        gd.roles[2].number = 2
+    while (i< len(roles)-1):
+        if (1 << i & roles_enabled != 0):
+            roles[i].number = 1
+        i += 1
+
+
+
+
+
+
+    roles[4].number = gnosia_enabled
+    if (roles[2].number == 1):
+
+        roles[2].number = 2
 
     if (gd.players >= gd.role_amount):
         i = 0
@@ -841,14 +851,14 @@ async def docreveal(ctx,*args):
 
 
 @bot.command()
-async def start(ctx):
+async def start(ctx, *args):
     if (gd.game == False and ctx.author.id == config['host_id'] and str(type(ctx.channel))) != "<class 'discord.channel.DMChannel'>":
         gd.info_channel = ctx.channel
         chan = ""
         if(gd.test == False):
             chan = ctx.author.voice.channel
 
-        await start_the_game(chan)
+        await start_the_game(chan,int(args[0]),int(args[1]))
         gd.voting_time = 180
         voting_timer.start()
 
@@ -868,3 +878,4 @@ async def guardreveal(args,ctx):
 
         if(players[x].role==2 and players[x].public_role!=2):
             await gd.info_channel.send("{0.name}  has announced {1.name} and {2.name}  were on guard duty".format(players[x],gd.guard_duty_ids[0],gd.guard_duty_ids[1]))
+bot.run(config['bot_token'])
