@@ -10,7 +10,7 @@ Linux:  <br />
         -random <br /> 
         -discord <br /> 
         -time <br /> 
-        (and any other packages that the interpreter will complain about being  <br />    
+        (and any other packages that the interpreter will complain about being   
         missing if I forgot to mention them here)
     3.Run "sudo PATH/TO/YOUR/VENV/bin/python3 PATH/TO/THE/GNOSIA/BOT/gnosia_bot.py <br /> 
 Windows: <br /> 
